@@ -4,6 +4,7 @@ import { AuthService } from './auth.service';
 import { User } from './user';
 import { LOCAL_STORAGE } from './local-storage.token';
 import { environment } from '../../environments/environment';
+import { LoginResponse } from './login-response';
 
 let storeValidUserCredentials;
 let storeInvalidUserCredentials;
@@ -59,8 +60,24 @@ describe('AuthService', () => {
     expect(service.isLoggedIn()).toBe(true);
   });
 
-  it('should log in and store user credentials - TODO', () => {
-    // TODO
+  it('should log in and store user credentials', () => {
+    const service: AuthService = TestBed.get(AuthService);
+    const httpTestingController = TestBed.get(HttpTestingController);
+
+    service.logIn('test-username', 'test-password').subscribe();
+    const loginRequest = httpTestingController.expectOne('api/SziaUsers/login');
+    const loginResponse: LoginResponse = { id: 'TOKEN', userId: 0, created: new Date().getTime(), ttl: 1000 };
+    loginRequest.flush(loginResponse);
+    const userRequest = httpTestingController.expectOne(`api/SziaUsers/${user.id}`);
+    userRequest.flush(user);
+    let currentUser;
+    service.currentUser.subscribe(u => (currentUser = u));
+
+    expect(currentUser).toBe(user);
+    expect(service.isLoggedIn()).toBe(true);
+    expect(storage.getItem(environment.tokenKey)).toBeDefined();
+    expect(storage.getItem(environment.tokenValidityEndKey)).toBeDefined();
+    expect(storage.getItem(environment.userKey)).toBeDefined();
   });
 
   it('should log out and delete user credentials', () => {
