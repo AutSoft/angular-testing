@@ -102,8 +102,15 @@ describe('ComplaintEditComponent', () => {
       expect(imageUrlInput.value).toBe('');
     });
 
-    it('should only be submitted if form is valid - TODO', () => {
-      // TODO
+    it('should only be submitted if form is valid', () => {
+      expect(submitButton.disabled).toBe(true);
+
+      writeValue(nameInput, newComplaint.name);
+      expect(submitButton.disabled).toBe(true);
+      writeValue(emailInput, newComplaint.email);
+      expect(submitButton.disabled).toBe(true);
+      writeValue(subjectInput, newComplaint.subject);
+      expect(submitButton.disabled).toBe(false);
     });
 
     it('should save the complaint', () => {
@@ -158,8 +165,12 @@ describe('ComplaintEditComponent', () => {
       expect(snackBar.open).toHaveBeenCalled();
     });
 
-    it('should be resubmitted after an error - TODO', () => {
-      // TODO
+    it('should be resubmitted after an error', () => {
+      submitButton.click();
+      expect(submitButton.disabled).toBe(true);
+      updateComplaintObserver.error(new Error());
+      fixture.detectChanges();
+      expect(submitButton.disabled).toBe(false);
     });
   });
 
